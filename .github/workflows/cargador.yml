@@ -1,0 +1,21 @@
+name: GritoUploader
+on:
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Work
+        run: |
+          mkdir -p assets
+          while read -r line; do
+            [ -z "$line" ] && continue
+            name=$(basename "$line" | cut -d? -f1)
+            curl -L "$line" -o "assets/$name"
+          done < lista.txt
+          git config user.name "bot"
+          git config user.email "bot@bot.com"
+          git add assets/
+          git commit -m "up"
+          git push
