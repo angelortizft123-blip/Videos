@@ -1,1 +1,29 @@
 
+name: Grito Bulk Uploader
+on: 
+  workflow_dispatch:
+
+jobs:
+  descarga_masiva:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Descargar videos desde la lista
+        run: |
+          mkdir -p assets
+          while IFS= read -r url || [ -n "$url" ]; do
+            if [ -n "$url" ]; then
+              filename=$(basename "$url" | cut -d? -f1)
+              echo "📥 Descargando: $filename"
+              curl -L "$url" -o "assets/$filename"
+            fi
+          done < lista.txt
+          
+      - name: Push a Repositorio
+        run: |
+          git config --global user.name "Grito Bot"
+          git config --global user.email "bot@grito.com"
+          git add assets/
+          git commit -m "🚀 Grito: Subida masiva"
+          git push
